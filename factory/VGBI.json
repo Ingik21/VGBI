@@ -1,0 +1,9 @@
+{
+	"name": "VGBI",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "8129ce50-efd3-45da-8058-373dc87504ef",
+		"tenantId": "94d92b60-e6fa-43c0-8005-e73e02812c34"
+	}
+}
