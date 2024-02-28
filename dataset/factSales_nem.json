@@ -1,0 +1,57 @@
+{
+	"name": "factSales_nem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "NEM_D",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "idCalendar",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "receipt",
+				"type": "nvarchar"
+			},
+			{
+				"name": "idStore",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "idProduct",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "unitsSold",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "rowBatchKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rowCreated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "h3",
+			"table": "factSales_stg"
+		}
+	}
+}

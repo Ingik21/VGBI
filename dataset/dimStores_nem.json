@@ -1,0 +1,49 @@
+{
+	"name": "dimStores_nem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "NEM_D",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rowKey",
+				"type": "nvarchar"
+			},
+			{
+				"name": "name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "city",
+				"type": "nvarchar"
+			},
+			{
+				"name": "location",
+				"type": "nvarchar"
+			},
+			{
+				"name": "rowBatchKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rowCreated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "h3",
+			"table": "dimStore_stg"
+		}
+	}
+}

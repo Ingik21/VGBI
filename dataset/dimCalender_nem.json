@@ -1,0 +1,70 @@
+{
+	"name": "dimCalender_nem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "NEM_D",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "date",
+				"type": "date"
+			},
+			{
+				"name": "year",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "monthNo",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "weekNo",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "YYYYmm",
+				"type": "nvarchar"
+			},
+			{
+				"name": "YYYYww",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dayOfMonth",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "dayOfYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "rowBatchKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "rowCreated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "h3",
+			"table": "dimCalendar_stg"
+		}
+	}
+}
