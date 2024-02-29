@@ -1,0 +1,818 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "VGBI"
+		},
+		"NEM_D_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'NEM_D'"
+		},
+		"SRC_D_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SRC_D'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/NEM_D')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('NEM_D_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SRC_D')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('SRC_D_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimCalender_nem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "date",
+						"type": "date"
+					},
+					{
+						"name": "year",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "monthNo",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "weekNo",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "YYYYmm",
+						"type": "nvarchar"
+					},
+					{
+						"name": "YYYYww",
+						"type": "nvarchar"
+					},
+					{
+						"name": "dayOfMonth",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "dayOfYear",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "rowBatchKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowCreated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "h3",
+					"table": "dimCalendar_stg"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimProducts_nem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "category",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cost",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 2
+					},
+					{
+						"name": "price",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 2
+					},
+					{
+						"name": "rowBatchKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowCreated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "rowModified",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "h3",
+					"table": "dimProduct_stg"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimProducts_src')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SRC_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "category",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cost",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "price",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "data",
+					"table": "products"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SRC_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimStores_nem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "city",
+						"type": "nvarchar"
+					},
+					{
+						"name": "location",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowBatchKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowCreated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "h3",
+					"table": "dimStore_stg"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimStores_src')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SRC_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "city",
+						"type": "nvarchar"
+					},
+					{
+						"name": "location",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "data",
+					"table": "stores"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SRC_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/factInventory_nem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "idStore",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "idProduct",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "inStock",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowBatchKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowCreated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "h3",
+					"table": "factInventory_stg"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/factInventory_src')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SRC_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "idStore",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "idProduct",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "InStock",
+						"type": "smallint",
+						"precision": 5
+					}
+				],
+				"typeProperties": {
+					"schema": "data",
+					"table": "inventory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SRC_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/factSales_nem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "idCalendar",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "receipt",
+						"type": "nvarchar"
+					},
+					{
+						"name": "idStore",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "idProduct",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "unitsSold",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "rowBatchKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "rowCreated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "h3",
+					"table": "factSales_stg"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/factSales_src')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SRC_D",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "date",
+						"type": "date"
+					},
+					{
+						"name": "idStore",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "idProduct",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "unitsSold",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "receipt",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "data",
+					"table": "sales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SRC_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PostProcess')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "StartBatch",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[job].[sp_BatchStart]",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dimProducts_nem",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "AssignBatchID",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "StartBatch",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "batchID",
+							"value": {
+								"value": "@activity('StartBatch').output.pipelineReturnValue",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Assign Batch Output",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "AssignBatchID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "batchId",
+									"value": {
+										"type": "Int",
+										"content": -1
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "EL",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "AssignBatchID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dimProducts_src",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dimProducts_nem",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Publish",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "EL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[h3].[dimProduct_publish]",
+								"storedProcedureParameters": {
+									"batchID": {
+										"type": "Int32",
+										"value": {
+											"value": "@variables('batchID')",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dimProducts_nem",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Post Process",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Publish",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[h3].[dimProduct_postprocess]",
+								"storedProcedureParameters": {
+									"batchID": {
+										"type": "Int32",
+										"value": {
+											"value": "@variables('batchID')",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dimProducts_nem",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "End Batch",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Post Process",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[job].[sp_BatchEnd]",
+							"storedProcedureParameters": {
+								"batchId": {
+									"value": {
+										"value": "@variables('batchID')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "NEM_D",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"batchID": {
+						"type": "Integer"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dimProducts_nem')]",
+				"[concat(variables('factoryId'), '/datasets/dimProducts_src')]",
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		}
+	]
+}
