@@ -1,0 +1,263 @@
+{
+	"name": "PostProcess",
+	"properties": {
+		"activities": [
+			{
+				"name": "StartBatch",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[job].[sp_BatchStart]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dimProducts_nem",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "AssignBatchID",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "StartBatch",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "batchID",
+					"value": {
+						"value": "@activity('StartBatch').output.pipelineReturnValue",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Assign Batch Output",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "AssignBatchID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "batchId",
+							"value": {
+								"type": "Int",
+								"content": -1
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "EL",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "AssignBatchID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "dimProducts_src",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dimProducts_nem",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Publish",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "EL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[h3].[dimProduct_publish]",
+						"storedProcedureParameters": {
+							"batchID": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('batchID')",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dimProducts_nem",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Post Process",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Publish",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[h3].[dimProduct_postprocess]",
+						"storedProcedureParameters": {
+							"batchID": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('batchID')",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dimProducts_nem",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "End Batch",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Post Process",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[job].[sp_BatchEnd]",
+					"storedProcedureParameters": {
+						"batchId": {
+							"value": {
+								"value": "@variables('batchID')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"batchID": {
+				"type": "Integer"
+			}
+		},
+		"annotations": []
+	}
+}
