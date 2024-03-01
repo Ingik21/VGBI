@@ -1,5 +1,5 @@
 {
-	"name": "dimStores_main",
+	"name": "dimStore_sub",
 	"properties": {
 		"activities": [
 			{
@@ -21,7 +21,7 @@
 				"typeProperties": {
 					"variableName": "batchid",
 					"value": {
-						"value": "@activity('Start Batch').output.pipelineReturnValue",
+						"value": "@activity('Start Batch').output.firstRow.batchid",
 						"type": "Expression"
 					}
 				}
@@ -48,8 +48,8 @@
 						{
 							"key": "batchid",
 							"value": {
-								"type": "Int",
-								"content": -1
+								"type": "Expression",
+								"content": "@variables('batchid')"
 							}
 						}
 					],
@@ -185,6 +185,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"additionalColumns": {
+							"type": "Expression",
+							"value": "@variables('batchid')"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

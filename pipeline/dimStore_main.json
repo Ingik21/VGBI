@@ -1,0 +1,76 @@
+{
+	"name": "dimStore_main",
+	"properties": {
+		"activities": [
+			{
+				"name": "dimStore_main",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Batch fail",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "dimStore_main",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[job].[sp_BatchFail]",
+					"storedProcedureParameters": {
+						"batchId": {
+							"value": {
+								"value": "@activity('dimStore_main').output.pipelineReturnValue",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "NEM_D",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Fail",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "Batch fail",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": {
+						"value": "@concat(pipeline().Pipeline, ':failed to run')",
+						"type": "Expression"
+					},
+					"errorCode": "500"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
