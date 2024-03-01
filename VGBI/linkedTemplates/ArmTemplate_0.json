@@ -558,6 +558,19 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderStoredProcedureName": "[[job].[sp_BatchStart]",
+								"storedProcedureParameters": {
+									"batchId": {
+										"type": "Int32",
+										"value": {
+											"value": "@variables('batchID')",
+											"type": "Expression"
+										}
+									},
+									"jobName": {
+										"type": "String",
+										"value": "HELLO WORLD"
+									}
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -614,8 +627,8 @@
 								{
 									"key": "batchId",
 									"value": {
-										"type": "Int",
-										"content": -1
+										"type": "Expression",
+										"content": "@variables('batchID')"
 									}
 								}
 							],
