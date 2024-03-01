@@ -700,17 +700,6 @@
 									},
 									{
 										"source": {
-											"name": "rowKey",
-											"type": "String"
-										},
-										"sink": {
-											"name": "rowKey",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
 											"name": "name",
 											"type": "String",
 											"physicalType": "nvarchar"
