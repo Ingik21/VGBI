@@ -232,6 +232,17 @@
 									"type": "Int32",
 									"physicalType": "int"
 								}
+							},
+							{
+								"source": {
+									"name": "rowCreated",
+									"type": "String"
+								},
+								"sink": {
+									"name": "rowCreated",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
 							}
 						],
 						"typeConversion": true,
