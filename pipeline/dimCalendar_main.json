@@ -297,20 +297,7 @@
 									"physicalType": "char"
 								}
 							},
-							{
-								"sink": {
-									"name": "rowBatchKey",
-									"type": "Int32",
-									"physicalType": "int"
-								}
-							},
-							{
-								"sink": {
-									"name": "dateCreated",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							}
+							null
 						],
 						"typeConversion": true,
 						"typeConversionSettings": {
