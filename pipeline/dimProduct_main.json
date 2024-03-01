@@ -59,7 +59,7 @@
 				"typeProperties": {
 					"variableName": "batchID",
 					"value": {
-						"value": "@activity('StartBatch').output.pipelineReturnValue",
+						"value": "@activity('StartBatch').output.firstRow.batchId",
 						"type": "Expression"
 					}
 				}
@@ -136,13 +136,6 @@
 									"value": "@utcnow()",
 									"type": "Expression"
 								}
-							},
-							{
-								"name": "rowModified",
-								"value": {
-									"value": "'NULL'",
-									"type": "Expression"
-								}
 							}
 						],
 						"queryTimeout": "02:00:00",
@@ -172,17 +165,6 @@
 							},
 							{
 								"source": {
-									"name": "rowKey",
-									"type": "String"
-								},
-								"sink": {
-									"name": "rowKey",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
 									"name": "name",
 									"type": "String",
 									"physicalType": "nvarchar"
@@ -218,7 +200,7 @@
 									"type": "Decimal",
 									"physicalType": "decimal",
 									"scale": 2,
-									"precision": 19
+									"precision": 9
 								}
 							},
 							{
@@ -234,7 +216,7 @@
 									"type": "Decimal",
 									"physicalType": "decimal",
 									"scale": 2,
-									"precision": 19
+									"precision": 9
 								}
 							},
 							{
@@ -255,17 +237,6 @@
 								},
 								"sink": {
 									"name": "rowCreated",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							},
-							{
-								"source": {
-									"name": "rowModified",
-									"type": "String"
-								},
-								"sink": {
-									"name": "rowModified",
 									"type": "DateTime",
 									"physicalType": "datetime"
 								}
