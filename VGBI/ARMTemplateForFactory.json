@@ -84,7 +84,7 @@
 						"typeProperties": {
 							"variableName": "batchID",
 							"value": {
-								"value": "@activity('StartBatch').output.pipelineReturnValue",
+								"value": "@activity('StartBatch').output.firstRow.batchId",
 								"type": "Expression"
 							}
 						}
@@ -153,19 +153,15 @@
 								"additionalColumns": [
 									{
 										"name": "rowBatchKey",
-										"value": ""
+										"value": {
+											"value": "@variables('batchID')",
+											"type": "Expression"
+										}
 									},
 									{
 										"name": "rowCreated",
 										"value": {
 											"value": "@utcnow()",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "rowModified",
-										"value": {
-											"value": "'NULL'",
 											"type": "Expression"
 										}
 									}
@@ -197,17 +193,6 @@
 									},
 									{
 										"source": {
-											"name": "rowKey",
-											"type": "String"
-										},
-										"sink": {
-											"name": "rowKey",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
 											"name": "name",
 											"type": "String",
 											"physicalType": "nvarchar"
@@ -243,7 +228,7 @@
 											"type": "Decimal",
 											"physicalType": "decimal",
 											"scale": 2,
-											"precision": 19
+											"precision": 9
 										}
 									},
 									{
@@ -259,7 +244,7 @@
 											"type": "Decimal",
 											"physicalType": "decimal",
 											"scale": 2,
-											"precision": 19
+											"precision": 9
 										}
 									},
 									{
@@ -280,17 +265,6 @@
 										},
 										"sink": {
 											"name": "rowCreated",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "rowModified",
-											"type": "String"
-										},
-										"sink": {
-											"name": "rowModified",
 											"type": "DateTime",
 											"physicalType": "datetime"
 										}
@@ -549,7 +523,97 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dimStores_main')]",
+			"name": "[concat(parameters('factoryName'), '/dimStore_main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dimStore_main",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "dimStore_sub",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Batch fail",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "dimStore_main",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[job].[sp_BatchFail]",
+							"storedProcedureParameters": {
+								"batchId": {
+									"value": {
+										"value": "@activity('dimStore_main').output.pipelineReturnValue",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "NEM_D",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Fail",
+						"type": "Fail",
+						"dependsOn": [
+							{
+								"activity": "Batch fail",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"message": {
+								"value": "@concat(pipeline().Pipeline, ':failed to run')",
+								"type": "Expression"
+							},
+							"errorCode": "500"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/dimStore_sub')]",
+				"[concat(variables('factoryId'), '/linkedServices/NEM_D')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dimStore_sub')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -573,7 +637,7 @@
 						"typeProperties": {
 							"variableName": "batchid",
 							"value": {
-								"value": "@activity('Start Batch').output.pipelineReturnValue",
+								"value": "@activity('Start Batch').output.firstRow.batchid",
 								"type": "Expression"
 							}
 						}
@@ -600,8 +664,8 @@
 								{
 									"key": "batchid",
 									"value": {
-										"type": "Int",
-										"content": -1
+										"type": "Expression",
+										"content": "@variables('batchid')"
 									}
 								}
 							],
@@ -740,6 +804,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"additionalColumns": {
+									"type": "Expression",
+									"value": "@variables('batchid')"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
