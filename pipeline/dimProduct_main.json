@@ -139,13 +139,6 @@
 									"value": "@utcnow()",
 									"type": "Expression"
 								}
-							},
-							{
-								"name": "rowModified",
-								"value": {
-									"value": "'NULL'",
-									"type": "Expression"
-								}
 							}
 						],
 						"queryTimeout": "02:00:00",
@@ -210,7 +203,7 @@
 									"type": "Decimal",
 									"physicalType": "decimal",
 									"scale": 2,
-									"precision": 19
+									"precision": 9
 								}
 							},
 							{
@@ -226,7 +219,7 @@
 									"type": "Decimal",
 									"physicalType": "decimal",
 									"scale": 2,
-									"precision": 19
+									"precision": 9
 								}
 							},
 							{
@@ -238,28 +231,6 @@
 									"name": "rowBatchKey",
 									"type": "Int32",
 									"physicalType": "int"
-								}
-							},
-							{
-								"source": {
-									"name": "rowCreated",
-									"type": "String"
-								},
-								"sink": {
-									"name": "rowCreated",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							},
-							{
-								"source": {
-									"name": "rowModified",
-									"type": "String"
-								},
-								"sink": {
-									"name": "rowModified",
-									"type": "DateTime",
-									"physicalType": "datetime"
 								}
 							}
 						],
