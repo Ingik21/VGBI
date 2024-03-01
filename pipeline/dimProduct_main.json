@@ -59,7 +59,7 @@
 				"typeProperties": {
 					"variableName": "batchID",
 					"value": {
-						"value": "@activity('StartBatch').output.pipelineReturnValue",
+						"value": "@activity('StartBatch').output.firstRow.batchId",
 						"type": "Expression"
 					}
 				}
