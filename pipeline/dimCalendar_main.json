@@ -62,6 +62,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[h3].[dimCalendar_publish]",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -89,7 +90,19 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[h3].[dimCalendar_postprocess]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "dimCalender_nem",
+						"type": "DatasetReference"
+					}
+				}
 			},
 			{
 				"name": "Assign batch id",
@@ -167,6 +180,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "rowBatchKey",
+								"value": {
+									"value": "@variables('batchId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -276,13 +298,17 @@
 								}
 							},
 							{
-								"source": {
-									"name": "batchId"
-								},
 								"sink": {
 									"name": "rowBatchKey",
 									"type": "Int32",
 									"physicalType": "int"
+								}
+							},
+							{
+								"sink": {
+									"name": "dateCreated",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							}
 						],
