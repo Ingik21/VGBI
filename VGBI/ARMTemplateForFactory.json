@@ -139,13 +139,6 @@
 								"type": "AzureSqlSource",
 								"additionalColumns": [
 									{
-										"name": "rowKey",
-										"value": {
-											"value": "@variables('batchID')",
-											"type": "Expression"
-										}
-									},
-									{
 										"name": "rowBatchKey",
 										"value": ""
 									},
@@ -159,7 +152,7 @@
 									{
 										"name": "rowModified",
 										"value": {
-											"value": "@utcnow()",
+											"value": "'NULL'",
 											"type": "Expression"
 										}
 									}
