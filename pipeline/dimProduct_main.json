@@ -128,7 +128,10 @@
 						"additionalColumns": [
 							{
 								"name": "rowBatchKey",
-								"value": ""
+								"value": {
+									"value": "@variables('batchID')",
+									"type": "Expression"
+								}
 							},
 							{
 								"name": "rowCreated",
