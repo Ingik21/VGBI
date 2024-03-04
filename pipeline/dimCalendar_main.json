@@ -198,10 +198,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"additionalColumns": {
-							"type": "Expression",
-							"value": "@variables('batchId')"
-						},
+						"additionalColumns": [
+							{
+								"name": "rowBatchKey",
+								"value": {
+									"value": "@variables('batchId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -308,16 +313,6 @@
 									"name": "yearWeek",
 									"type": "String",
 									"physicalType": "char"
-								}
-							},
-							{
-								"source": {
-									"name": "batchId"
-								},
-								"sink": {
-									"name": "rowBatchKey",
-									"type": "Int32",
-									"physicalType": "int"
 								}
 							}
 						],
