@@ -19,7 +19,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "batchId",
+					"variableName": "batchid",
 					"value": {
 						"value": "@activity('Start Batch').output.firstRow.batchid",
 						"type": "Expression"
