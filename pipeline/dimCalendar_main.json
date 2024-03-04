@@ -314,6 +314,17 @@
 									"type": "String",
 									"physicalType": "char"
 								}
+							},
+							{
+								"source": {
+									"name": "rowBatchKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "rowBatchKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
 							}
 						],
 						"typeConversion": true,
