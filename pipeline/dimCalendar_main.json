@@ -63,6 +63,15 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderStoredProcedureName": "[h3].[dimCalendar_publish]",
+						"storedProcedureParameters": {
+							"BatchId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('batchId')",
+									"type": "Expression"
+								}
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -95,6 +104,15 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderStoredProcedureName": "[h3].[dimCalendar_postprocess]",
+						"storedProcedureParameters": {
+							"BatchId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('batchId')",
+									"type": "Expression"
+								}
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -180,15 +198,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "rowBatchKey",
-								"value": {
-									"value": "@variables('batchId')",
-									"type": "Expression"
-								}
-							}
-						],
+						"additionalColumns": {
+							"type": "Expression",
+							"value": "@variables('batchId')"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -297,7 +310,16 @@
 									"physicalType": "char"
 								}
 							},
-							null
+							{
+								"source": {
+									"name": "batchId"
+								},
+								"sink": {
+									"name": "rowBatchKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
 						],
 						"typeConversion": true,
 						"typeConversionSettings": {
@@ -339,7 +361,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[job].[sp_BatchEnd]"
+					"storedProcedureName": "[job].[sp_BatchEnd]",
+					"storedProcedureParameters": {
+						"batchId": {
+							"value": {
+								"value": "@variables('batchId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "NEM_D",
