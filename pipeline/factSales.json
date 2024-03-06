@@ -270,7 +270,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[h3].[factInventory_publish]",
+						"sqlReaderStoredProcedureName": "[h3].[factSales_publish]",
 						"storedProcedureParameters": {
 							"BatchId": {
 								"type": "Int32",
